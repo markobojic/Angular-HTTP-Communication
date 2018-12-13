@@ -1,3 +1,5 @@
+import { ActivatedRoute } from '@angular/router';
+import { BookTrackerError } from './../models/bookTrackerError';
 import { Component, OnInit, VERSION } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { Title } from '@angular/platform-browser';
@@ -18,15 +20,25 @@ export class DashboardComponent implements OnInit {
   mostPopularBook: Book;
 
   constructor(private dataService: DataService,
-              private title: Title) { }
+              private title: Title,
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.dataService.getAllBooks()
-      .subscribe(
-        (data: Book[]) => this.allBooks = data,
-        (err: any) => console.log(err),
-        () => console.log('get books completed')
-      );
+    // Implementation before introduce resolver (just for reference)
+    // this.dataService.getAllBooks()
+    //   .subscribe(
+    //     (data: Book[]) => this.allBooks = data,
+    //     (err: BookTrackerError) => console.log(err.friendlyMessage),
+    //     () => console.log('get books completed')
+    //   );
+    const resolvedData: Book[] | BookTrackerError = this.route.snapshot.data['resolvedBooks'];
+
+    if (resolvedData instanceof BookTrackerError) {
+      console.log(`Dashboard component error: ${resolvedData.friendlyMessage}`);
+    } else {
+      this.allBooks = resolvedData;
+    }
+
     this.dataService.getAllReaders()
       .subscribe(
         (data: Reader[]) => this.allReaders = data,
@@ -55,7 +67,7 @@ export class DashboardComponent implements OnInit {
           const index: number = this.allReaders.findIndex(reader => reader.readerID === readerID);
           this.allReaders.splice(index, 1);
         },
-        (err: any) => console.log(err);
+        (err: any) => console.log(err)
       )
   }
 
