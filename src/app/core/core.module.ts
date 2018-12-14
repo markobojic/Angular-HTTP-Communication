@@ -10,6 +10,8 @@ import { BookTrackerErrorHandlerService } from './book-tracker-error-handler.ser
 import { BookResolverService } from './books-resolver.service';
 import { AddHeaderInterceptor } from './add-header.interceptor';
 import { LogResponceInterceptor } from './log-response.interceptor';
+import { HttpCacheService } from './http-cache.service';
+import { CacheInterceptor } from './cache.interceptor';
 
 @NgModule({
   imports: [
@@ -22,7 +24,9 @@ import { LogResponceInterceptor } from './log-response.interceptor';
     { provide: ErrorHandler, useClass: BookTrackerErrorHandlerService },
     BookResolverService,
     { provide: HTTP_INTERCEPTORS, useClass: AddHeaderInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: LogResponceInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: LogResponceInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: CacheInterceptor, multi: true },
+    HttpCacheService
   ]
 })
 export class CoreModule {
